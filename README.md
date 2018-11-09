@@ -24,7 +24,9 @@ Documentation is provided in `C++/SPCVT.h`. The Lua implementation follows the e
 Only once, create one instance of SPCVT choosing the desired maximum radius. From there, you call FOV or LOS according to what you need.
 
 FOV asks for an origin point (for instance, the player's position to check what they can see), a callback function that answers if a given
-position blocks line of sight and a callback function that is used to set the inform which floor tiles are visible. The former function can be used to set the visibility instead of the second, to directly set the visibility of visible wall tiles as well. See `C++/SPCVT.h` for more information.
+position blocks line of sight and a callback function that is used to set the inform which floor tiles are visible. The former function can be used to set the visibility instead of the second, to directly set the visibility of visible wall tiles as well. See `C++/SPCVT.h` for more information and the figure below for an example.
+
+![Example of FOV](images/example.png)
 
 LOS asks for two points and answers if they can see each other. It also asks for a callback function that answers if a given position blocks line of sight. One final optional parameter is a callback function that is called for each point within the line of sight. See `C++/SPCVT.h` for more information.
 
