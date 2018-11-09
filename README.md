@@ -44,7 +44,7 @@ LOS asks for two points and answers if they can see each other. It also asks for
 
 There are three points of why.
 
-When I discovered PCVT on the web, I also realized that there is confusion about how it works, why one should use it, and what are its advantages, despite the altorighm being incredibly simple compared with most of the other approaches on the web.
+When I discovered PCVT on the web, I also realized that there is a lot of confusion about how it works, why one should use it, and what are its advantages, despite the altorighm being incredibly simple compared with most of the other approaches on the web.
 As I liked the method for its simplicity, I wanted to come up with a clean and accessible implementation for other people to use it.
 
 Finally, I added two improvements that makes PCVT competitive in certain use cases, as I explain next.
