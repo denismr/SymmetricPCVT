@@ -72,7 +72,7 @@ The following figure presents the average number of times each cell is visited f
 
 ### C++
 
-Apparently, std::function is slow-ish. There are [alternatives](https://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11) that keep the same behavior (although there are comments about corner cases where it way slower than std::function). Anyway, I preferred to keep this solution to make the code easier to use.
+Apparently, std::function is slow-ish. There are [alternatives](https://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11) that keep the same behavior (although there are comments about corner cases where it is way slower than std::function). Anyway, I preferred to keep this solution to make the code easier to use.
 
 ### Lua
 
