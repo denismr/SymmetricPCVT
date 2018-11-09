@@ -1,5 +1,3 @@
-require 'stuf.BlockGlobal'
-
 local SPCVT = require 'SPCVT'
 
 local tilemap = {
