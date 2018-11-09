@@ -52,7 +52,7 @@ Fast LOS is another very useful thing to have, as it is usually not necessary to
 Instead, one could want to just check which itens, from a small list, a NPC can see.
 (note: since the algorithm is symmetric, computing the FOV for the player already reveals which monsters see the player as well).
 
-One common problem is that most FOV algorithms do not provide a straight way of computing the LOS between two points without computing the full FOV for either point. To avoid additional time cost, one may use Bresenham's Line to perform a raycast. However, the visibility behavior would differ from the one obtained by computing the FOV. Furthermore, Bresenham's algorithm itself is assymetric (although this fact is easlity mitigated by using the less known TranThong algorithm).
+One common problem is that most FOV algorithms do not provide a straight way of computing the LOS between two points without computing the full FOV for either point. To avoid additional time cost, one may use Bresenham's Line to perform a raycast. However, the visibility behavior would differ from the one obtained by computing the FOV. Furthermore, Bresenham's algorithm itself is assymetric (although this fact is easily mitigated by using the less known TranThong algorithm).
 
 In this implementation, the `LOS(a, b)` is true if and only if `b` is in the `FOV(a)` and if and only if `a` is in the `FOV(b)`. However, computing LOS is roughly `O(ED(a,b))`, while computing FOV is roughly `O(π*r*r)`, where `ED` is the euclidean distance and `r` is the maximum radius for the FOV. 
 
