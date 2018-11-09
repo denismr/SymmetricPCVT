@@ -66,13 +66,13 @@ I note that the cost of computing the full FOV with PCVT is also very competitiv
 
 ![Illustration of visits per cell when radius is 13](images/visits13.png)
 
-The following figure presents the average number of times each cell is visited for different radii, from one to 150 with increments of one. The source data for this plot is available in `images/data.csv` and the code in `C++/genPlot.cc`.
+The following figure presents the average number of times each cell is visited for different radii, from one to 150 with increments of one. The source data for this plot is available in `images/data.csv` and the code in `C++/examples/genPlot.cc`.
 
 ![Plot of visits per cell for various radii](images/visits_radii.png)
 
 One important observation on this matter is that the number of visits is not evenly distributed accross the cells.
 To check this, I created two instances of SPCVT: one of them with a radius of 30, and the other with a radius of 150. For each SPCVT, I varied the maximum depth of the traversal on the trie by limiting the radius (called inner radius) with the DoesBlockVision callback.
-The code is available in `C++/genPlot2.cc`.
+The code is available in `C++/examples/genPlot2.cc`.
 
 The following figures show the average number of times each cell was visited, in this case. The first show the number of visits per cell for varying inner radii and outer radius fixed at 30. The second has an outer radius fixed at 150.
 
