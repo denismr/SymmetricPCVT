@@ -70,6 +70,18 @@ The following figure presents the average number of times each cell is visited f
 
 ![Plot of visits per cell for various radii](images/visits_radii.png)
 
+One important observation on this matter is that the number of visists is not evenly distributed accross the cells.
+To check this, I created two instances of SPCVT: one of them with a radius of 30, and the other with a radius of 150. For each SPCVT, I varied the maximum depth of the traversal on the trie by limiting the radius (called inner radius) with the DoesBlockVision callback.
+The code is available in `C++/genPlot2.cc`.
+
+The following figures show the average number of times each cell was visited, in this case. The first show the number of visits por cell for varying inner radii and fixed radius at 30. The second has a fixed radius at 150.
+
+![Visits por cell for varying inner radii and fixed radius at 30](images/visits_radii_within_30.png)
+
+![Visits por cell for varying inner radii and fixed radius at 30](images/visits_radii_within_150.png)
+
+
+
 ## Possible improvements
 
 ### C++
