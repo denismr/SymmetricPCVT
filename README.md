@@ -15,7 +15,7 @@ Currently, there are implementations for:
 * C++14
 * Lua (luajit)
 
-I may implement the algorithm in more languages if there is demand. One such a possibility is a C wrapper for the C++ implementation, so that it can be used with FFI.
+I may implement the algorithm in more languages if there is demand. One such a possibility is a C wrapper for the C++ implementation so that it can be used with FFI.
 
 ## How to use it?
 
@@ -34,7 +34,7 @@ LOS asks for two points and answers if they can see each other. It also asks for
 
 * The constructor of SPCVT is a bit heavy on computation. Do not create an instace every time you want to compute FOV. Instead, create one instance just once and reuse it for each FOV computation.
 
-* *The algorithm is only symmetric if just one radius is used for all FOV and LOS computations!* If you need characteres with varying radius of sight, create one instance of SPCVT with the biggest radius and limit FOV/LOS of characters that have lower radius through your personalized callback functions (the ones that check whether a cell is visible), filtering out cells that are out of reach.
+* *The algorithm is only symmetric if just one radius is used for all FOV and LOS computations!* If you need characteres with varying radii, create one instance of SPCVT with the biggest radius and limit FOV/LOS of characters that have lower radius through your personalized callback functions (the ones that check whether a cell is visible), filtering out cells that are out of reach.
 
 * FOV will call the DoesBlockVision callback with positions that do not exist / are out of the bounds of your world grid. The callback must treat those cases. The SetVisibility callback should always be called with valid positions, though.
 
