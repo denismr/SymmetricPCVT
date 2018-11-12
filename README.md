@@ -15,7 +15,7 @@ Currently, there are implementations for:
 * C++14
 * Lua (luajit)
 
-I may implement the algorithm in more languages if there are demand. One such a possibility is a C wrapper for the C++ implementation, so that it can be used with FFI.
+I may implement the algorithm in more languages if there is demand. One such a possibility is a C wrapper for the C++ implementation, so that it can be used with FFI.
 
 ## How to use it?
 
