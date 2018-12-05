@@ -28,7 +28,7 @@ position blocks line of sight and a callback function that is used to inform whi
 
 ![Example of FOV](images/example.PNG)
 
-LOS asks for two points and answers if they can see each other. It also asks for a callback function that answers if a given position blocks line of sight. One final optional parameter is a callback function that is called for each point within the line of sight. See `C++/SPCVT.h` for more information.
+LOS asks for two points and answers if they can see each other. It also asks for a callback function that answers if a given position blocks line of sight. One final optional parameter is a callback function that is called for each point within the line of sight (useful for tracing the path of projectiles). See `C++/SPCVT.h` for more information.
 
 ## Cautions in the use
 
