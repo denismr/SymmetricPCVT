@@ -16,10 +16,10 @@ public:
    * Constructor of Symmetric Pre-Computed Visibility Trie.
    * @param radius the maximum distance from which an object is still visible.
    * @param dense if false, only casts rays towards the border of the square
-   *        that enclouses the vison circle. Otherwise, casts ray towards each
+   *        that enclouses the vision circle. Otherwise, casts ray towards each
    *        point within the square. Setting true is not recommended as the
    *        resulting trie will contain many more duplicated points (with
-   *        different prefixes), which void the utility of this structure.
+   *        different prefixes), which voids the utility of this structure.
    *        Default is false.
    */
   SPCVT(int radius, bool dense = false);
