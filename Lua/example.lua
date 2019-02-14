@@ -25,7 +25,7 @@ for k, v in ipairs(tilemap) do
 end
 
 local function blocksVisibility(x, y)
-  if x < 1 or x > 21 or y < 1 or y > 11 then return false end
+  if x < 1 or x > 21 or y < 1 or y > 11 then return true end
   visibility[y][x] = true -- You can place it here to draw the visible walls as well
   return tilemap[y][x] == '#'
 end
