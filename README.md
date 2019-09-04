@@ -1,6 +1,6 @@
 # Symmetric Pre-Computed Visibility Trie + Fast LOS
 
-![Art](images/beautiful.png)
+![Art](images/beautiful_v2.png)
 
 This is my implementation of
 [Pre-Computed Visibility Tries](http://www.roguebasin.com/index.php?title=Pre-Computed_Visibility_Tries) (PCVT)
