@@ -62,7 +62,7 @@ An illustration of the symmetry is shown in the next figure.
 
 ![Illustration of symmetry](images/symmetry.png)
 
-I note that the cost of computing the full FOV with PCVT is also very competitive with other approaches. There is barely any calculation for each cell in the grid, since the algorithm is simply a traversal in a pre-computed trie. The following figure details the number of times each cell is visited when the radius is 13.
+I note that the cost of computing the full FOV with PCVT is also very competitive against other approaches. There is barely any calculation for each cell in the grid, since the algorithm is simply a traversal in a pre-computed trie. The following figure details the number of times each cell is visited when the radius is 13.
 
 ![Illustration of visits per cell when radius is 13](images/visits13_v2.png)
 
