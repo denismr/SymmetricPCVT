@@ -91,8 +91,8 @@ bool SPCVT::LOS(int a_x, int a_y, int b_x, int b_y,
 
   Trie* trace = nullptr;
   for (Trie* possible : fast_los_map[los_key]) {
+    trace = possible;
     for (Trie* cur = possible; cur != nullptr; cur = cur->antecedent) {
-      trace = cur;
       if (DoesBlockVision(cur->x + a_x, cur->y + a_y)) {
         trace = nullptr;
         break;
