@@ -14,6 +14,7 @@ Currently, there are implementations for:
 
 * C++14
 * Lua (luajit)
+* Python
 
 I may implement the algorithm in more languages if there is demand. One such a possibility is a C wrapper for the C++ implementation so that it can be used with FFI.
 
@@ -81,8 +82,11 @@ The following figures show the average number of times each cell was visited, in
 ![Visits per cell for varying inner radii and fixed radius at 30](images/visits_radii_within_150.png)
 
 
-
 ## Possible improvements
+
+### Algorithm
+
+Since the algorithm is symmetric, we can reduce its memory footprint to 1/8 of what's currently being used by memoizing the trie for only a half quadrant ans remapping the coordinates.
 
 ### C++
 
