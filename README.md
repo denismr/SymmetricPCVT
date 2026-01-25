@@ -42,6 +42,42 @@ This new version is much stricter. In the previous version, you might see a tile
 ========================================
 ```
 
+## Benchmark
+
+The result of using **RSPCVT** is mathematically equivalent to computing FOV by running a dedicated **Tran-Thong** line-of-sight check for every single cell within the vision radius. 
+
+While the output is identical, RSPCVT is significantly faster because it eliminates redundant tile checks near the origin and uses the Trie structure to "prune" entire branches of visibility as soon as a blocker is encountered.
+
+### Luajit
+
+[Code](Lua/benchmark.lua)
+
+```
+Benchmarking: Radius 20, 50000 iterations
+--------------------------------------------------
+Avg Map Gen Time:    0.000067 s
+Total Naive Time:    14.4841 s (excl. map gen)
+Total RSPCVT Time:   1.7989 s (excl. map gen)
+--------------------------------------------------
+Speedup Factor:      8.05x faster
+Avg RSPCVT FOV:      0.000036 s
+```
+
+### Python
+
+[Code](Python/benchmark.py)
+
+```
+Benchmarking Python RSPCVT: Radius 20, 10000 iterations
+--------------------------------------------------
+Avg Map Gen Time:    0.000133 s
+Total Naive Time:    19.3844 s (excl. map gen)
+Total RSPCVT Time:   1.3683 s (excl. map gen)
+--------------------------------------------------
+Speedup Factor:      14.17x faster
+Avg RSPCVT FOV:      0.000137 s
+```
+
 ---
 
 ## Features
@@ -50,6 +86,8 @@ This is an implementation of [Pre-Computed Visibility Tries](http://www.roguebas
 
 * **Strict Symmetry:** Guaranteed FOV symmetry (A sees B $\iff$ B sees A).
 * **Fast LOS:** Line of Sight checks with the efficiency of a single raycast, guaranteed to match the FOV behavior exactly.
+
+However, there is a **major drawback**: the visibility is much stricter (less permissive).
 
 Currently, there are implementations for:
 * **C++17**
