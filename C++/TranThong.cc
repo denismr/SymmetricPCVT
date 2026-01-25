@@ -1,44 +1,51 @@
 #include "TranThong.h"
-#include <utility>
-#include <tuple>
+#include <functional>
+#include <cstdlib>
 
-void TranThong(int xstart, int ystart, int xend, int yend, std::function<void(int, int)> callback) {
+static inline int sign(int x) {
+  return (x > 0) - (x < 0);
+}
 
-  auto Difference = [](int xstrt, int xnd) {
-    return xnd >= xstrt ? std::make_tuple(xnd - xstrt, 1) : std::make_tuple(xstrt - xnd, -1);
-  };
+void TranThong(
+  int x0, int y0,
+  int x1, int y1,
+  std::function<void(int, int)> callback
+) {
+  int dx = x1 - x0;
+  int dy = y1 - y0;
 
-  int x = xstart;
-  int y = ystart;
+  int sx = sign(dx);
+  int sy = sign(dy);
 
-  int deltax, signdx;
-  std::tie(deltax, signdx) = Difference(xstart, xend);
-  int deltay, signdy;
-  std::tie(deltay, signdy) = Difference(ystart, yend);
-  
+  dx = std::abs(dx);
+  dy = std::abs(dy);
+
+  int x = x0;
+  int y = y0;
+
   callback(x, y);
 
-  int test = signdy == -1 ? -1 : 0;
-
-  if (deltax >= deltay) {
-    test = (deltax + test) >> 1;
-    for (int i = 0; i < deltax; i++) {
-      test -= deltay;
-      x += signdx;
-      if (test < 0) {
-        y += signdy;
-        test += deltax;
+  if (dx >= dy) {
+    // x-major
+    int err = dx - dy;
+    for (int i = 0; i < dx; ++i) {
+      x += sx;
+      err -= 2 * dy;
+      if (err < 0) {
+        y += sy;
+        err += 2 * dx;
       }
       callback(x, y);
     }
   } else {
-    test = (deltay + test) >> 1;
-    for (int i = 0; i < deltay; i++) {
-      test -= deltax;
-      y += signdy;
-      if (test < 0) {
-        x += signdx;
-        test += deltay;
+    // y-major
+    int err = dy - dx;
+    for (int i = 0; i < dy; ++i) {
+      y += sy;
+      err -= 2 * dx;
+      if (err < 0) {
+        x += sx;
+        err += 2 * dy;
       }
       callback(x, y);
     }

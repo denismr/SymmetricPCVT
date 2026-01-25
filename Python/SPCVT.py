@@ -1,42 +1,50 @@
 from typing import Callable, List, Optional, Tuple
 
 
-def tranthong(xstart: int,
-               ystart: int,
-               xend: int,
-               yend: int,
-               callback: Callable[[int, int], None]) -> None:
-  def difference(xstrt: int, xnd: int) -> Tuple[int, int]:
-    return (xnd - xstrt, 1) if xnd >= xstrt else (xstrt - xnd, -1)
-  
-  x: int = xstart
-  y: int = ystart
+def tranthong(
+    x0: int,
+    y0: int,
+    x1: int,
+    y1: int,
+    callback: Callable[[int, int], None]
+) -> None:
+    def sign(v: int) -> int:
+        return (v > 0) - (v < 0)
 
-  deltax, signdx = difference(xstart, xend)
-  deltay, signdy = difference(ystart, yend)
+    dx = x1 - x0
+    dy = y1 - y0
 
-  callback(x, y)
+    sx = sign(dx)
+    sy = sign(dy)
 
-  test: int = -1 if signdy == 1 else 0
+    dx = abs(dx)
+    dy = abs(dy)
 
-  if deltax >= deltay:
-    test = (deltax + test) >> 1
-    for _ in range(deltax):
-      test -= deltay
-      x += signdx
-      if test < 0:
-        y += signdy
-        test += deltax
-      callback(x, y)
-  else:
-    test = (deltay + test) >> 1
-    for _ in range(deltay):
-      test -= deltax
-      y += signdy
-      if test < 0:
-        x += signdx
-        test += deltay
-      callback(x, y)
+    x = x0
+    y = y0
+
+    callback(x, y)
+
+    if dx >= dy:
+        # x-major
+        err = dx - dy
+        for _ in range(dx):
+            x += sx
+            err -= 2 * dy
+            if err < 0:
+                y += sy
+                err += 2 * dx
+            callback(x, y)
+    else:
+        # y-major
+        err = dy - dx
+        for _ in range(dy):
+            y += sy
+            err -= 2 * dx
+            if err < 0:
+                x += sx
+                err += 2 * dy
+            callback(x, y)
 
 
 class Trie:

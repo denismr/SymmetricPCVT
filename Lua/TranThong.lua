@@ -7,46 +7,50 @@
   Computers & Graphics 6.1 (1982): 15-17.
 ]]
 
-local bit = require 'bit'
+local function abs(x) return x < 0 and -x or x end
 
-local function Difference(xstrt, xnd)
-  if xnd >= xstrt then
-    return xnd - xstrt, 1
-  else
-    return xstrt - xnd, -1
-  end
+local function sign(x)
+  if x < 0 then return -1 end
+  if x > 0 then return 1 end
+  return 0
 end
 
-local function TranThong(xstart, ystart, xend, yend, callback)
-  local x = xstart
-  local y = ystart
+local function TranThong(x0, y0, x1, y1, callback)
+  local dx = x1 - x0
+  local dy = y1 - y0
 
-  local deltax, signdx = Difference(xstart, xend)
-  local deltay, signdy = Difference(ystart, yend)
+  local sx = sign(dx)
+  local sy = sign(dy)
+
+  dx = abs(dx)
+  dy = abs(dy)
+
+  local x = x0
+  local y = y0
 
   callback(x, y)
 
-  local test = signdy == -1 and -1 or 0
-
-  if deltax >= deltay then
-    test = bit.rshift(deltax + test, 1)
-    for i = 1, deltax do
-      test = test - deltay
-      x = x + signdx
-      if test < 0 then
-        y = y + signdy
-        test = test + deltax
+  if dx >= dy then
+    -- x-major
+    local e = dx - dy
+    for _ = 1, dx do
+      x = x + sx
+      e = e - 2 * dy
+      if e < 0 then
+        y = y + sy
+        e = e + 2 * dx
       end
       callback(x, y)
     end
   else
-    test = bit.rshift(deltay + test, 1)
-    for i = 1, deltay do
-      test = test - deltax
-      y = y + signdy
-      if test < 0 then
-        x = x + signdx
-        test = test + deltay
+    -- y-major
+    local e = dy - dx
+    for _ = 1, dy do
+      y = y + sy
+      e = e - 2 * dx
+      if e < 0 then
+        x = x + sx
+        e = e + 2 * dy
       end
       callback(x, y)
     end
