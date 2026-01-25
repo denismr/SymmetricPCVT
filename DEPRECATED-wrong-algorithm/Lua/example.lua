@@ -1,6 +1,6 @@
-local RSPCVT = require 'RSPCVT'
+local SPCVT = require 'SPCVT'
 
-local str_tilemap = {
+local tilemap = {
   "#####################",
   "#....#..........#...#",
   "#....#..............#",
@@ -15,9 +15,7 @@ local str_tilemap = {
 };
 
 local visibility = {}
-local tilemap = {}
-
-for k, v in ipairs(str_tilemap) do
+for k, v in ipairs(tilemap) do
   tilemap[k] = {}
   visibility[k] = {}
   for ch in v:gmatch '.' do
@@ -28,18 +26,19 @@ end
 
 local function blocksVisibility(x, y)
   if x < 1 or x > 21 or y < 1 or y > 11 then return true end
+  visibility[y][x] = true -- You can place it here to draw the visible walls as well
   return tilemap[y][x] == '#'
 end
 
 local function setVisible(x, y)
-  visibility[y][x] = true -- not needed (see previous comment)
+  -- visibility[y][x] = true -- not needed (see previous comment)
 end
 
 local before = os.clock()
-local fov = RSPCVT(30)
+local fov = SPCVT(30)
 local after = os.clock()
 
-print(string.format('%.3f seconds to create RSPCVT with radius = 30.', after - before))
+print(string.format('%.3f seconds to create SPCVT with radius = 30.', after - before))
 
 before = os.clock()
 fov:FOV(11, 6, blocksVisibility, setVisible)

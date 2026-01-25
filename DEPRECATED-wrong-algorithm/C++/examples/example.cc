@@ -1,4 +1,4 @@
-#include "RSPCVT.h"
+#include "SPCVT.h"
 #include <iostream>
 #include <ctime>
 
@@ -21,17 +21,18 @@ int main() {
   
   auto blocksVisibility = [&](int x, int y) {
     if (x < 0 || x >= 21 || y < 0 || y >= 11) return true;
+    visibility[y][x] = true; // You can place it here to draw the visible walls as well
     return tilemap[y][x] == '#';
   };
 
   auto setVisible = [&](int x, int y) {
-    visibility[y][x] = true;
+    // visibility[y][x] = true; // not needed (see previous comment)
   };
 
   clock_t before = clock();
-  RSPCVT fov(30);
+  SPCVT fov(30);
   clock_t after = clock();
-  std::cout << ((after - before)/(double)CLOCKS_PER_SEC) << " seconds to create RSPCVT with radius = 30.\n";
+  std::cout << ((after - before)/(double)CLOCKS_PER_SEC) << " seconds to create SPCVT with radius = 30.\n";
 
   before = clock();
   fov.FOV(10, 5, blocksVisibility, setVisible);

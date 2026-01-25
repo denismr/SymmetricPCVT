@@ -1,94 +1,63 @@
-# Symmetric Pre-Computed Visibility Trie + Fast LOS
+# Really Symmetric Pre-Computed Visibility Trie (RSPCVT) + Fast LOS
 
 ![Art](images/beautiful_v2.png)
 
-This is my implementation of
-[Pre-Computed Visibility Tries](http://www.roguebasin.com/index.php?title=Pre-Computed_Visibility_Tries) (PCVT)
-with two improvements over the other descriptions on the web:
+## A Note on Symmetry and Revision (January 2026)
 
-* The resulting Field of View (FOV) is symmetric (it means that a point A sees B if and only if B sees A);
-* Line of Sight (LOS) with roughly the same time efficiency of one Bresenham's Line call,
-  but that keeps the exact same visibility behavior as the full FOV.
+Years after publishing the original SPCVT, I realized, thanks to rigorous testing and feedback from [Vivificient](https://www.reddit.com/user/Vivificient), that the original algorithm was not truly symmetric. While the rays themselves were symmetric, the "permissive" nature of the trie allowed for incidental visibility that didn't always hold up when the origin and target were swapped.
+
+I have now completely rewritten the core logic to address this. The original, "more permissive" (but asymmetric) code has been moved to the `DEPRECATED-wrong-algorithm` folder. It remains there as a reference for the original SPCVT, as it still holds certain merits common to other PCVT implementations: it is faster to compute and significantly more memory-efficient, even if it does not strictly adhere to symmetry. 
+
+The new **RSPCVT** (Really Symmetric Pre-Computed Visibility Trie) in the root directory is the recommended version for games where vision symmetry is a mechanical requirement.
+
+### The Fix: From Permissive to Strict
+The original problem stemmed from how a tree of Bresenham-like rays handles incidental visibility. In the previous version, point A could see B simply because the specific ray targeting point C happened to pass through B.
+
+This creates a symmetry break: while a single TranThong ray is perfectly symmetric when comparing the path between exactly two points (A to B vs. B to A), the set of rays originating from A is entirely different from the set of rays originating from B. Consequently, a ray starting at B might never pass through A on its way to its own targets, leaving A invisible to B even though B is visible to A.
+
+The new **RSPCVT** (Really Symmetric Pre-Computed Visibility Trie) fixes this by enforcing a strict rule: **Point B is visible from A if and only if the specific pre-computed ray $TT(A, B)$ is unobstructed.** No other ray is allowed to grant "incidental" visibility to that cell.
+
+**The Drawback:**
+This new version is much stricter. In the previous version, you might see a tile "around a corner" because a neighboring ray touched it. In RSPCVT, if the single dedicated ray for a tile is blocked, that tile is invisible—even if it seems like a "near miss" from a neighboring ray. This results in a "cleaner" but less permissive field of view.
+
+---
+
+## Features
+
+This is an implementation of [Pre-Computed Visibility Tries](http://www.roguebasin.com/index.php?title=Pre-Computed_Visibility_Tries) (PCVT) with two critical improvements:
+
+* **Strict Symmetry:** Guaranteed FOV symmetry (A sees B $\iff$ B sees A).
+* **Fast LOS:** Line of Sight checks with the efficiency of a single raycast, guaranteed to match the FOV behavior exactly.
 
 Currently, there are implementations for:
-
-* C++14
-* Lua (luajit)
-
-I may implement the algorithm in more languages if there is demand. One such a possibility is a C wrapper for the C++ implementation so that it can be used with FFI.
+* **C++17**
+* **Lua (optimized for LuaJIT)**
+* **Python 3**
 
 ## How to use it?
 
-Documentation is provided in `C++/SPCVT.h`. The Lua implementation follows the exact same interface. Examples are provided for both languages.
+Documentation is provided within the source files (`C++/RSPCVT.h`, `RSPCVT.lua`, and `RSPCVT.py`). 
 
-Only once, create one instance of SPCVT choosing the desired maximum radius. From there, you call FOV or LOS according to what you need.
-
-FOV asks for an origin point (for instance, the player's position to check what they can see), a callback function that answers if a given
-position blocks line of sight and a callback function that is used to inform which floor tiles are visible. The former function can be used to set the visibility instead of the second, to directly set the visibility of visible wall tiles as well. See `C++/SPCVT.h` for more information and the figure below for an example.
-
-![Example of FOV](images/example.PNG)
-
-LOS asks for two points and answers if they can see each other. It also asks for a callback function that answers if a given position blocks line of sight. One final optional parameter is a callback function that is called for each point within the line of sight (useful for tracing the path of projectiles). See `C++/SPCVT.h` for more information.
+1. **Initialize:** Create a single instance of `RSPCVT` with your desired maximum radius. This step is computationally expensive as it builds the Trie; do this only once (e.g., at level load).
+2. **FOV:** Pass an origin point, a `DoesBlockVision` callback, and a `SetVisible` callback.
+3. **LOS:** Pass two points to check if they have a clear line of sight. This uses the same `TranThong` ray logic as the FOV for perfect consistency.
 
 ## Cautions in the use
 
-* The constructor of SPCVT is a bit heavy on computation. Do not create an instace every time you want to compute FOV. Instead, create one instance just once and reuse it for each FOV computation.
+* **Memory Usage:** Because the new algorithm stores a list of "dependent targets" for every node in the trie to ensure symmetry, it uses significantly more RAM than the deprecated version. For very large radii (e.g., >100), expect high memory overhead.
+* **Symmetry and Variable Radii:** RSPCVT guarantees symmetry even between two observers using different `RSPCVT` instances with different radii. As long as both observers are within each other's maximum pre-computed distance, the ray $TT(A, B)$ used by Observer A will be the exact same path (in reverse) as $TT(B, A)$ used by Observer B.
+* **Out of Bounds:** Your `DoesBlockVision` callback must be able to handle coordinates that are outside your map boundaries, as the Trie will check all coordinates within the pre-computed square.
 
-* *The algorithm is only symmetric if just one radius is used for all FOV and LOS computations!* If you need characteres with varying radii, create one instance of SPCVT with the biggest radius and limit FOV/LOS of characters that have lower radius through your personalized callback functions (the ones that check whether a cell is visible), filtering out cells that are out of reach.
+## Why RSPCVT?
 
-* FOV will call the DoesBlockVision callback with positions that do not exist / are out of the bounds of your world grid. The callback must treat those cases. The SetVisibility callback should always be called with valid positions, though.
+Symmetry is a "Holy Grail" in roguelike development. It prevents frustrating gameplay situations where a monster can shoot a player who cannot see them in return. 
 
-* Similarly, LOS can potentially call DoesBlockVision with invalid positions, although this would happen only if there are invalid positions between the two points given to LOS. This case should not happen if the map is represented as a rectangular grid and only points within this grid are passed to LOS.
+By using the **TranThong** algorithm (a symmetric version of Bresenham's line), we ensure that the path from $A \to B$ is identical to $B \to A$. By combining this with a Trie that tracks target dependencies, we gain the performance of pre-computation without the common artifacts of shadowcasting or the asymmetries of naive raycasting.
 
-## Why?
-
-There are three points of why.
-
-When I discovered PCVT on the web, I also realized that there is a lot of confusion about how it works, why one should use it, and what are its advantages, despite the altorighm being incredibly simple compared with most of the other approaches on the web.
-As I liked the method for its simplicity, I wanted to come up with a clean and accessible implementation for other people to use it.
-
-Finally, I added two improvements that makes PCVT competitive in certain use cases, as I explain next.
-
-Symmetry is one of the most desirable traits for FOV algorithms, as people usually don't like to be hit by a monster that cannot be seen.
-Fast LOS is another very useful thing to have, as it is usually not necessary to compute the full FOV of non-player characteres (NPC), like monsters. 
-Instead, one could want to just check which itens, from a small list, a NPC can see.
-(note: since the algorithm is symmetric, computing the FOV for the player already reveals which monsters see the player as well).
-
-One common problem is that most FOV algorithms do not provide a straight way of computing the LOS between two points without computing the full FOV for either point. To avoid additional time cost, one may use Bresenham's Line to perform a raycast. However, the visibility behavior would differ from the one obtained by computing the FOV. Furthermore, Bresenham's algorithm itself is assymetric (although this fact is easily mitigated by using the less known TranThong algorithm).
-
-In this implementation, the `LOS(a, b)` is true if and only if `b` is in the `FOV(a)` and if and only if `a` is in the `FOV(b)`. However, computing LOS is roughly `O(ED(a,b))`, while computing FOV is roughly `O(π*r*r)`, where `ED` is the euclidean distance and `r` is the maximum radius for the FOV. 
-
-An illustration of the symmetry is shown in the next figure.
-
-![Illustration of symmetry](images/symmetry.png)
-
-I note that the cost of computing the full FOV with PCVT is also very competitive against other approaches. There is barely any calculation for each cell in the grid, since the algorithm is simply a traversal in a pre-computed trie. The following figure details the number of times each cell is visited when the radius is 13.
-
-![Illustration of visits per cell when radius is 13](images/visits13_v2.png)
-
-The following figure presents the average number of times each cell is visited for different radii, from one to 150 with increments of one. The source data for this plot is available in `images/data.csv` and the code in `C++/examples/genPlot.cc`.
-
-![Plot of visits per cell for various radii](images/visits_radii.png)
-
-One important observation on this matter is that the number of visits is not evenly distributed accross the cells.
-To check this, I created two instances of SPCVT: one of them with a radius of 30, and the other with a radius of 150. For each SPCVT, I varied the maximum depth of the traversal on the trie by limiting the radius (called inner radius) with the DoesBlockVision callback.
-The code is available in `C++/examples/genPlot2.cc`.
-
-The following figures show the average number of times each cell was visited, in this case. The first show the number of visits per cell for varying inner radii and outer radius fixed at 30. The second has an outer radius fixed at 150.
-
-![Visits per cell for varying inner radii and fixed radius at 30](images/visits_radii_within_30.png)
-
-![Visits per cell for varying inner radii and fixed radius at 30](images/visits_radii_within_150.png)
-
-
-
-## Possible improvements
+## Implementation notes
 
 ### C++
-
-Apparently, std::function is slow-ish. There are [alternatives](https://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11) that keep the same behavior (although there are comments about corner cases where it is way slower than std::function). Anyway, I preferred to keep this solution to make the code easier to use.
+The implementation uses `std::function` for callbacks. While convenient, it can be a bottleneck in extremely tight loops. If performance is critical, consider refactoring the `FOV` method to use a template-based visitor pattern.
 
 ### Lua
-
-Closures _can_ be slow (particularly if you are using Luajit 2.0.5 or prior rather than the newer 2.1 beta3) if you modify the captured values. In such cases, consider passing a callable table.
-(ps: yes, this is the type of closure used in `AddPath`, however this is only used during the construction of the SPCVT).
+The Lua implementation is optimized for LuaJIT, using integer keys and a reusable table cache to minimize Garbage Collection (GC) pressure during FOV calls.
