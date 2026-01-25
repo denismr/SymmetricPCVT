@@ -22,6 +22,28 @@ This new version is much stricter. In the previous version, you might see a tile
 
 ---
 
+## Empirical Symmetry Stress Test Result
+
+[Code](Lua/sym_stress_test.lua)
+
+```
+========================================
+   SYMMETRY CONFUSION MATRIX
+========================================
+ Total Valid Paths: 747870
+----------------------------------------
+ Both See (A<->B):   71226
+ Neither See:        676644
+----------------------------------------
+ Only A sees B:      0  (FAIL)
+ Only B sees A:      0  (FAIL)
+----------------------------------------
+ Final Result:       PERFECT SYMMETRY
+========================================
+```
+
+---
+
 ## Features
 
 This is an implementation of [Pre-Computed Visibility Tries](http://www.roguebasin.com/index.php?title=Pre-Computed_Visibility_Tries) (PCVT) with two critical improvements:
