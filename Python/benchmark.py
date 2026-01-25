@@ -4,9 +4,6 @@ import math
 from typing import List, Dict, Tuple, Callable
 from RSPCVT import tranthong, RSPCVT
 
-# Assuming RSPCVT and tranthong are in the current namespace or imported
-# from RSPCVT import RSPCVT, tranthong
-
 def create_random_map(size: int, density: float) -> List[List[bool]]:
     """Generates a 2D grid where True represents a wall."""
     return [[random.random() < density for _ in range(size)] for _ in range(size)]
