@@ -44,28 +44,40 @@ This new version is much stricter. In the previous version, you might see a tile
 
 ## Benchmark
 
-The result of using **RSPCVT** is mathematically equivalent to computing FOV by running a dedicated **Tran-Thong** line-of-sight check for every single cell within the vision radius. 
+The output of **RSPCVT** is mathematically equivalent to computing FOV by running a dedicated **Tran-Thong** line-of-sight check for every single cell within the bounding box of the vision radius. 
 
-While the output is identical, RSPCVT is significantly faster because it eliminates redundant tile checks near the origin and uses the Trie structure to "prune" entire branches of visibility as soon as a blocker is encountered.
+While the results are identical, RSPCVT is significantly more efficient. It eliminates redundant tile checks near the origin and uses its Trie structure to "prune" entire branches of visibility the moment a blocker is encountered.
 
-### Luajit
+Below, we compare RSPCVT against two Naive variants:
+1. **Standard Naive:** Uses a non-interruptible Tran-Thong ray. Even after hitting a blocker, the ray continues processing until it reaches the target coordinate.
+2. **Interruptible Naive (Fair):** Uses an optimized Tran-Thong ray that exits immediately after the first blocking cell is detected.
 
-[Code](Lua/benchmark.lua)
+### LuaJIT Performance
+*Tested with Radius 20 over 50,000 iterations. Average Map Gen: 0.000067s.*
 
-```
-Benchmarking: Radius 20, 50000 iterations
---------------------------------------------------
-Avg Map Gen Time:    0.000067 s
-Total Naive Time:    14.4841 s (excl. map gen)
-Total RSPCVT Time:   1.7989 s (excl. map gen)
---------------------------------------------------
-Speedup Factor:      8.05x faster
-Avg RSPCVT FOV:      0.000036 s
-```
+| Algorithm | Total Time (excl. Map Gen) | Avg. Time / FOV | Speedup vs. RSPCVT |
+| :--- | :--- | :--- | :--- |
+| Naive (Standard) | 14.4841 s | 0.000289 s | 8.05x slower |
+| Naive (Interruptible) | 9.7731 s | 0.000195 s | 5.69x slower |
+| **RSPCVT** | **1.7171 s** | **0.000034 s** | **—** |
+
+### Python Performance
+*Tested with Radius 20 over 10,000 iterations. Average Map Gen: ~0.000130s.*
+
+| Algorithm | Total Time (excl. Map Gen) | Avg. Time / FOV | Speedup vs. RSPCVT |
+| :--- | :--- | :--- | :--- |
+| Naive (Standard) | 19.3844 s | 0.001938 s | 14.17x slower |
+| Naive (Interruptible) | 7.3361 s | 0.000733 s | 5.22x slower |
+| **RSPCVT** | **1.3683 s** | **0.000137 s** | **—** |
+
+### Why the Speedup?
+* **Zero Redundancy:** In Naive approaches, tiles near the observer are visited by hundreds of overlapping rays. RSPCVT visits each unique relative tile in the trie exactly once.
+* **Recursive Pruning:** When RSPCVT hits a wall, it discards all "dependent targets" behind that wall instantly. Even an interruptible Naive approach must still initiate and partially process every individual ray targeting the area behind that wall.
+* **Call Overhead:** In high-level languages like Python, reducing function call volume from ~15,000 (Naive) to ~1,250 (RSPCVT) per FOV significantly lowers the execution floor.
 
 ### Python
 
-[Code](Python/benchmark.py)
+[non-interrruptable baseline](Python/benchmark.py)
 
 ```
 Benchmarking Python RSPCVT: Radius 20, 10000 iterations
@@ -76,6 +88,19 @@ Total RSPCVT Time:   1.3683 s (excl. map gen)
 --------------------------------------------------
 Speedup Factor:      14.17x faster
 Avg RSPCVT FOV:      0.000137 s
+```
+
+[non-interrruptable baseline](Python/benchmark.py)
+
+```
+Benchmarking Python (Fair): Radius 20, 10000 iterations
+--------------------------------------------------
+Avg Map Gen Time:    0.000127 s
+Total Naive Time:    7.3361 s (excl. map gen)
+Total RSPCVT Time:   1.4057 s (excl. map gen)
+--------------------------------------------------
+Speedup Factor:      5.22x faster
+Avg RSPCVT FOV:      0.000141 s
 ```
 
 ---
