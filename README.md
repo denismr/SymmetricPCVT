@@ -73,7 +73,6 @@ Below, we compare RSPCVT against two Naive variants:
 ### Why the Speedup?
 * **Zero Redundancy:** In Naive approaches, tiles near the observer are visited by hundreds of overlapping rays. RSPCVT visits each unique relative tile in the trie exactly once.
 * **Recursive Pruning:** When RSPCVT hits a wall, it discards all "dependent targets" behind that wall instantly. Even an interruptible Naive approach must still initiate and partially process every individual ray targeting the area behind that wall.
-* **Call Overhead:** In high-level languages like Python, reducing function call volume from ~15,000 (Naive) to ~1,250 (RSPCVT) per FOV significantly lowers the execution floor.
 
 ### Python
 
@@ -146,3 +145,4 @@ The implementation uses `std::function` for callbacks. While convenient, it can 
 
 ### Lua
 The Lua implementation is optimized for LuaJIT, using integer keys and a reusable table cache to minimize Garbage Collection (GC) pressure during FOV calls.
+
